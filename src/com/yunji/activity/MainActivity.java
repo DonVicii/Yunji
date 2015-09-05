@@ -1,4 +1,6 @@
-package com.example.yunji;
+package com.yunji.activity;
+
+import com.example.yunji.R;
 
 import android.app.Activity;
 import android.os.Bundle;
