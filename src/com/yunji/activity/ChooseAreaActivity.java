@@ -13,6 +13,7 @@ import com.yunji.util.HttpCallbackListener;
 import com.yunji.util.HttpUtil;
 import com.yunji.util.Utility;
 
+import android.R.bool;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -69,13 +70,17 @@ public class ChooseAreaActivity extends Activity{
 	 * 当前选中的级别
 	 */
 	private int currentLevel;
-	
+	/**
+	 * 是否从weatherActivity中跳转过来
+	 */
+	private boolean isFromWeatherActivity;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if (prefs.getBoolean("city_selected", false)) {
-			Intent intent = new Intent(this,WeatherActivity.class);
+		if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+			Intent intent = new Intent(this, WeatherActivity.class);
 			startActivity(intent);
 			finish();
 			return;
@@ -144,7 +149,6 @@ public class ChooseAreaActivity extends Activity{
 			titleText.setText(selectedProvince.getProvinceName());
 			currentLevel = LEVEL_CITY;
 		}else{
-			Log.i("wtf", "进入服务器读取市数据");
 			queryFromServer(selectedProvince.getProvinceCode(),"city");
 		}
 	}
@@ -161,7 +165,7 @@ public class ChooseAreaActivity extends Activity{
 			adapter.notifyDataSetChanged();
 			listView.setSelection(0);
 			titleText.setText(selectedCity.getCityName());
-			currentLevel = LEVEL_CITY;
+			currentLevel = LEVEL_COUNTY;
 		}else{
 			queryFromServer(selectedCity.getCityCode(),"county");
 		}
@@ -253,6 +257,10 @@ public class ChooseAreaActivity extends Activity{
 		}else if (currentLevel == LEVEL_CITY) {
 			queryProvinces();
 		}else{
+			if (isFromWeatherActivity) {
+				Intent intent = new Intent(this, WeatherActivity.class);
+				startActivity(intent);
+			}
 			finish();
 		}
 	}
